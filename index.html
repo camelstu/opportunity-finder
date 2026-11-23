@@ -1,0 +1,638 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex,nofollow">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Farm Energy Opportunity Finder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&display=swap">
+<style>
+/* One question at a time: a narrow card, big tap targets, a clear "not sure" route on every question. */
+:root{
+  --bg:#f5f6f1; --panel:#ffffff; --ink:#1d2621; --muted:#5d6b62; --line:#dde2d8;
+  --field:#2f6b45; --field-soft:#e3efe5; --sun:#c98a12; --sun-soft:#fbf0d6; --grid:#2c5d8f; --grid-soft:#e2ecf6;
+  --good:#2f7d46; --warn:#b26b00; --bad:#b3372b;
+  --display:"Bricolage Grotesque","IBM Plex Sans",system-ui,sans-serif;
+  --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121713; --panel:#1a211c; --ink:#e7ece6; --muted:#9aa89e; --line:#2d3830;
+  --field:#7cc193; --field-soft:#1f3326; --sun:#e9b44c; --sun-soft:#3a2e14; --grid:#86b4e0; --grid-soft:#1b2a3a;
+  --good:#7cc193; --warn:#e9b44c; --bad:#ef8a7c; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121713; --panel:#1a211c; --ink:#e7ece6; --muted:#9aa89e; --line:#2d3830;
+  --field:#7cc193; --field-soft:#1f3326; --sun:#e9b44c; --sun-soft:#3a2e14; --grid:#86b4e0; --grid-soft:#1b2a3a;
+  --good:#7cc193; --warn:#e9b44c; --bad:#ef8a7c; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:16px/1.55 var(--body);margin:0}
+.wrap{max-width:640px;margin:0 auto;padding-block:20px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}
+.brand{font:700 18px var(--display);letter-spacing:-.01em}
+.adv-link{font-size:14px;color:var(--grid)}
+.prog{height:6px;border-radius:99px;background:var(--line);overflow:hidden;margin-bottom:6px}
+.prog>i{display:block;height:100%;background:var(--field);transition:width .3s}
+.count{font-size:13px;color:var(--muted);margin-bottom:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:22px 20px}
+h1{font:700 clamp(24px,5vw,32px)/1.15 var(--display);margin:0 0 6px;letter-spacing:-.01em;text-wrap:balance}
+h2{font:700 20px/1.2 var(--display);margin:0}
+.help{color:var(--muted);margin:0 0 18px}
+.choices{display:grid;gap:10px}
+.choices.two{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.choice{display:block;width:100%;text-align:left;padding:14px 16px;border:1.5px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:600 16px var(--body);cursor:pointer}
+.choice small{display:block;font-weight:400;color:var(--muted);font-size:14px;margin-top:2px}
+.choice:hover{border-color:var(--field)}
+.choice.on{border-color:var(--field);background:var(--field-soft)}
+input{font:inherit;font-size:18px;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:10px;padding:12px 14px;width:100%;min-width:0}
+input:focus-visible,button:focus-visible,a:focus-visible{outline:2px solid var(--grid);outline-offset:2px}
+.unit{display:flex;gap:8px;align-items:center}
+.unit span{color:var(--muted);white-space:nowrap}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-bottom:12px}
+.seg button{border:0;border-radius:0;background:var(--panel);padding:7px 12px;font:500 14px var(--body);color:var(--ink);cursor:pointer}
+.seg button.on{background:var(--field);color:var(--panel)}
+.nav{display:flex;gap:10px;align-items:center;margin-top:22px;flex-wrap:wrap}
+.btn{font:600 16px var(--body);border-radius:10px;padding:12px 18px;cursor:pointer;border:1.5px solid var(--line);background:var(--panel);color:var(--ink)}
+.btn.primary{background:var(--field);border-color:var(--field);color:var(--panel);margin-left:auto}
+.btn.ghost{border-color:transparent;background:transparent;color:var(--muted);padding-inline:6px}
+.dunno{display:block;width:100%;margin-top:12px;padding:12px 16px;border:1.5px dashed var(--line);border-radius:10px;background:transparent;color:var(--ink);font:500 15px var(--body);cursor:pointer;text-align:left}
+.dunno b{color:var(--field)}
+.dunno:hover{border-color:var(--field)}
+.spend{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-bottom:12px}
+.spend>div{background:var(--bg);border-radius:10px;padding:12px;display:grid;gap:2px}
+.spend .l{font-size:13px;color:var(--muted)} .spend b{font:700 24px/1.15 var(--display);font-variant-numeric:tabular-nums} .spend .s{font-size:13px;color:var(--muted)}
+.note{font-size:14px;color:var(--muted);margin-top:10px}
+.err{font-size:14px;color:var(--bad);margin-top:8px}
+/* results */
+.res{display:grid;gap:14px}
+.kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px}
+.kpi{padding:12px;border-radius:10px;background:var(--bg)}
+.kpi .v{font:700 clamp(22px,5vw,28px)/1.1 var(--display);font-variant-numeric:tabular-nums}
+.kpi .l{font-size:13px;color:var(--muted)}
+.tag{display:inline-block;font:600 12px var(--body);padding:2px 8px;border-radius:4px;background:var(--grid-soft);color:var(--grid)}
+.pts{display:grid;gap:12px;margin:0;padding:0;list-style:none}
+.pts li{display:grid;grid-template-columns:auto 1fr;gap:10px}
+.pts .dot{width:10px;height:10px;border-radius:50%;margin-top:7px}
+.typ{background:var(--sun-soft);border-radius:10px;padding:12px 14px;font-size:14px}
+.typ button{font:600 14px var(--body);color:var(--grid);background:none;border:0;padding:0;cursor:pointer;text-decoration:underline}
+details.more>summary{cursor:pointer;font-weight:600;padding:4px 0}
+.advice{display:grid;gap:12px;margin-top:10px}
+.adv{display:grid;grid-template-columns:auto 1fr;gap:10px}
+.adv .dot{width:10px;height:10px;border-radius:50%;margin-top:6px}
+.small{font-size:13px;color:var(--muted)}
+.ai{white-space:pre-wrap;margin-top:10px}
+footer{margin-top:24px;color:var(--muted);font-size:12px;display:grid;gap:4px}
+a{color:var(--grid)}
+@media (prefers-reduced-motion:reduce){.prog>i{transition:none}}
+</style>
+
+</head>
+<body>
+<div style="background:#2c5d8f;color:#fff;font:600 13px system-ui,sans-serif;text-align:center;padding:6px 12px">Preview: built with data from the AgriWatt project</div>
+<div class="wrap">
+  <div class="top"><span class="brand">Farm Energy Finder</span><a class="adv-link" href="advanced.html" id="advLink">Advanced version →</a></div>
+  <div id="progWrap"><div class="prog"><i id="prog" style="width:0"></i></div><div class="count" id="count"></div></div>
+  <main id="screen" aria-live="polite"></main>
+  <div hidden><datalist id="subList"></datalist><div id="connAdvice"></div><div id="moreAdvice"></div><ol id="nextSteps"></ol><div id="chart"></div></div>
+  <footer>
+    <div>Built on real farm data from the AgriWatt trial at Rosuick Farm, Cornwall.</div>
+    <div id="dataNote"></div>
+    <div>Estimates only, ex VAT. Not financial advice. Get quotes before you invest. Postcode data: ONS Postcode Directory (Open Government Licence v3.0).</div>
+  </footer>
+</div>
+
+<script>
+(()=>{
+const $=id=>document.getElementById(id);
+const fmt=(n,d=0)=>isFinite(n)?n.toLocaleString('en-GB',{maximumFractionDigits:d,minimumFractionDigits:d}):'–';
+const gbp=n=>isFinite(n)?(n<0?'−£':'£')+Math.abs(Math.round(n)).toLocaleString('en-GB'):'–';
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const DIM=[31,28,31,30,31,30,31,31,30,31,30,31];
+const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+let D={}, hhProfile=null, exampleMode=false;
+
+/* ---------------- data ---------------- */
+async function loadData(){
+  const get=f=>fetch(f).then(r=>{if(!r.ok)throw new Error(f);return r.json()});
+  const [prof,tar,pc,hr]=await Promise.all([get('data/agriwatt-profiles.json'),get('data/tariffs.json'),get('data/postcode-sectors.json'),get('data/headroom-nged-sw.json')]);
+  D={prof,tar,pc,hr};
+  const dl=$('subList'); hr.rows.forEach(r=>{const o=document.createElement('option');o.value=r[0];dl.appendChild(o)});
+  $('dataNote').textContent=`Data: Octopus business tariffs (${tar.version}); Agile prices ${prof.agile.period}; solar and farm load profiles from the AgriWatt trial at Rosuick Farm, Cornwall; network headroom from NGED (South West).`;
+}
+
+/* ---------------- location ---------------- */
+const REGION_TO_GSP={'Eastern':'A','East Midlands':'B','London':'C','West Midlands':'E','North East':'F','North West':'G','South East':'J','Yorkshire and the Humber':'M','South West':'L'};
+function gspFromLatLng(region,lat,lng){
+  if(region==='Scotland') return lat>56.5?'P':'N';
+  if(region==='Wales') return lat>52.45?'D':'K';
+  if(region==='North West' && lat<53.5 && lng>-3.2 && lng<-2.4) return 'D';
+  if(region==='South East' && lng<-0.75) return 'H';
+  if(region==='South West' && lng>-2.0) return 'H';
+  return REGION_TO_GSP[region]||'L';
+}
+function lookupPostcode(pc){
+  pc=(pc||'').toUpperCase().replace(/\s+/g,'');
+  if(pc.length<5) return null;
+  const sec=pc.slice(0,-3)+' '+pc.slice(-3,-2);
+  const s=D.pc.sectors[sec]; if(!s) return null;
+  const region=D.pc.regions[s[2]]||'', town=D.pc.towns[s[3]]||'';
+  return {sector:sec,lat:s[0],lng:s[1],region,town,gsp:gspFromLatLng(region,s[0],s[1])};
+}
+/* ---------------- MPAN ---------------- */
+function parseMpan(raw){
+  const d=(raw||'').replace(/\D/g,''); if(!d) return null;
+  const core=d.length>=21?d.slice(-13):d.length===13?d:null;
+  if(!core) return {error:'An MPAN core has 13 digits (or 21 with the top line).'};
+  const P=[3,5,7,13,17,19,23,29,31,37,41,43]; let s=0; for(let i=0;i<12;i++) s+= +core[i]*P[i];
+  const ok=(s%11)%10===+core[12];
+  const id=core.slice(0,2); const g=Object.entries(D.tar.regions).find(([,r])=>r.mpanId===id);
+  const pcls=d.length>=21?d.slice(0,2):null;
+  return {core,ok,gsp:g?g[0]:null,profileClass:pcls};
+}
+/* ---------------- load profile ---------------- */
+function loadShape(ent,loads){
+  const L=D.prof.loads; let mh;
+  if(L[ent]&&L[ent].mh) mh=L[ent].mh.map(r=>r.slice());
+  else{
+    let h=(L[ent]&&L[ent].h)||null;
+    if(!h){ // generic daytime-heavy shape for arable/hort/other
+      h=[0.5,0.45,0.45,0.45,0.5,0.6,0.9,1.3,1.5,1.5,1.5,1.45,1.4,1.4,1.4,1.35,1.3,1.2,1.0,0.85,0.75,0.7,0.6,0.55];
+    }
+    const m=h.reduce((a,b)=>a+b,0)/24; mh=Array.from({length:12},()=>h.map(x=>x/m));
+    if(ent==='hort') mh=mh.map((r,i)=>r.map(x=>x*[1.4,1.3,1.1,0.9,0.8,0.8,0.8,0.8,0.9,1.1,1.3,1.4][i]));
+  }
+  if(loads.includes('drying')||ent==='arable'){ // harvest drying Aug-Oct
+    mh=mh.map((r,i)=>r.map((x,h)=>x*([7,8,9].includes(i)?(h>=8&&h<=22?1.9:1.3):0.85)));
+  }
+  if(loads.includes('irrigation')) mh=mh.map((r,i)=>r.map(x=>x*([5,6,7].includes(i)?1.35:0.93)));
+  if(loads.includes('heat')) mh=mh.map((r,i)=>r.map(x=>x*[1.35,1.3,1.15,1.0,0.85,0.75,0.72,0.72,0.8,0.95,1.2,1.35][i]));
+  // normalise so annual mean = 1
+  let tot=0; mh.forEach((r,i)=>r.forEach(x=>tot+=x*DIM[i])); const k=8760/tot;
+  return mh.map(r=>r.map(x=>x*k));
+}
+function buildLoad(inp){
+  // returns {mh: month x hour kW, annual kWh, source}
+  if(inp.useMode==='hh' && hhProfile) return {mh:hhProfile.mh,annual:hhProfile.annual,source:'half-hourly data',peak:hhProfile.peak};
+  const shape=loadShape(inp.ent,inp.loads);
+  let annual=inp.annualKwh, src='yearly total', monthly=null;
+  if(inp.useMode==='monthly'){const m=inp.monthly; if(m.filter(x=>x>0).length>=3){const known=m.map((x,i)=>x>0?x:null); const avg=known.filter(x=>x!=null).reduce((a,b)=>a+b,0)/known.filter(x=>x!=null).length; monthly=known.map(x=>x??avg); annual=monthly.reduce((a,b)=>a+b,0); src='monthly bills';}}
+  if(inp.useMode==='estimate'||!(annual>0)){
+    if(inp.ent==='dairy'&&inp.cows>0){annual=inp.cows*D.prof.loads.dairy.kwhPerUnit; src='estimate: '+inp.cows+' cows';}
+    else {annual={mixed:18000,dairy:60000,broiler:290000,pig:490000,arable:30000,hort:80000,other:20000}[inp.ent]; src='typical '+ENTS[inp.ent].label.toLowerCase()+' farm';}
+  }
+  let mh=shape.map(r=>r.map(x=>x*annual/8760));
+  if(monthly){ mh=mh.map((r,i)=>{const s=r.reduce((a,b)=>a+b,0)*DIM[i]; return r.map(x=>x*monthly[i]/s);}); }
+  const peak=Math.max(...mh.flat())*1.35;
+  return {mh,annual,source:src,peak};
+}
+function parseHH(text){
+  const lines=text.split(/\r?\n/).filter(l=>l.trim()); if(lines.length<50) throw new Error('That file looks too short for half-hourly data.');
+  const head=lines[0].split(',').map(s=>s.trim().toLowerCase());
+  let ci=head.findIndex(h=>/consum|kwh|value|import/.test(h)), ti=head.findIndex(h=>/start|time|date|interval/.test(h));
+  let startRow=1; if(ci<0||ti<0){ci=1;ti=0;startRow=isNaN(Date.parse(lines[0].split(',')[0]))?1:0;}
+  const sum=Array.from({length:12},()=>Array(24).fill(0)), cnt=Array.from({length:12},()=>Array(24).fill(0));
+  let total=0,n=0,first=Infinity,last=-Infinity,peak=0;
+  for(let i=startRow;i<lines.length;i++){const c=lines[i].split(','); const v=parseFloat(c[ci]); const t=new Date(c[ti].trim()); if(!isFinite(v)||isNaN(t)) continue;
+    const m=t.getMonth(), h=t.getHours(); sum[m][h]+=v*2; cnt[m][h]++; total+=v; n++; first=Math.min(first,+t); last=Math.max(last,+t); peak=Math.max(peak,v*2);}
+  if(n<48) throw new Error('No half-hourly readings found. The file needs a time column and a kWh column.');
+  const days=(last-first)/864e5+1/48;
+  const overall=total/(n/2); // mean kW
+  const mh=sum.map((r,m)=>r.map((s,h)=>cnt[m][h]?s/cnt[m][h]:null));
+  // fill missing months with the overall mean shape
+  const hourMean=Array.from({length:24},(_,h)=>{let s=0,k=0;mh.forEach(r=>{if(r[h]!=null){s+=r[h];k++}});return k?s/k:overall});
+  const filled=mh.map(r=>r.map((x,h)=>x??hourMean[h]));
+  const annual=total*365/days;
+  return {mh:filled,annual,peak,days:Math.round(days),n};
+}
+
+/* ---------------- tariffs and prices ---------------- */
+function agileMatrix(gsp,kind){
+  const f=D.tar.regions[gsp].agileFactor; const base=D.prof.agile[kind==='imp'?'import':'export'];
+  return base.map(r=>r.map((x,h)=>x*(kind==='imp'?(h>=16&&h<19?f[1]:f[0]):(h>=16&&h<19?f[3]:f[2]))));
+}
+function tariffSets(gsp){
+  const R=D.tar.regions[gsp], E=D.tar.export, flat=v=>Array.from({length:12},()=>Array(24).fill(v));
+  const ai=agileMatrix(gsp,'imp'), ae=agileMatrix(gsp,'exp');
+  return [
+    {id:'fseg',name:'12M Fixed + SEG export',imp:flat(R.fixed12.unit),exp:flat(E.seg.rate),sc:R.fixed12.sc},
+    {id:'fpp',name:'12M Fixed + Panel Power export',imp:flat(R.fixed12.unit),exp:flat(E.panelPower.rate),sc:R.fixed12.sc},
+    {id:'fae',name:'12M Fixed + Agile export',imp:flat(R.fixed12.unit),exp:ae,sc:R.fixed12.sc},
+    {id:'aae',name:'Agile import + Agile export',imp:ai,exp:ae,sc:R.agileSC},
+    {id:'aseg',name:'Agile import + SEG export',imp:ai,exp:flat(E.seg.rate),sc:R.agileSC}
+  ];
+}
+
+/* ---------------- simulation: one average day per month ---------------- */
+function simulate(load,solarMh,kwp,battKwh,tariff,exportCap,importCap){
+  const eta=0.95, P=battKwh>0?Math.min(Math.max(battKwh*0.5,5),250):0, cyc=1.0;
+  let cost=0, impK=0, expK=0, selfK=0, spill=0, genK=0;
+  for(let m=0;m<12;m++){
+    const L=load.mh[m], pi=tariff.imp[m], pe=tariff.exp[m];
+    const S=solarMh[m].map(x=>x*kwp);
+    const direct=L.map((l,h)=>Math.min(l,S[h]));
+    const def=L.map((l,h)=>l-direct[h]); const sur=S.map((s,h)=>s-direct[h]);
+    let imp=def.slice(), exp=Array(24).fill(0), spl=Array(24).fill(0);
+    // export room each hour after solar export
+    sur.forEach((s,h)=>{const e=Math.min(s,exportCap); exp[h]=e; spl[h]=s-e;});
+    if(battKwh>0){
+      // discharge opportunities: cover deficit (value pi) then export (value pe, if export room)
+      const outs=[]; for(let h=0;h<24;h++){const a=Math.min(def[h],P); if(a>0)outs.push({h,v:pi[h],cap:a,kind:'def'}); const b=Math.min(P-a,Math.max(0,exportCap-exp[h])); if(b>0)outs.push({h,v:pe[h],cap:b,kind:'exp'});}
+      outs.sort((x,y)=>y.v-x.v);
+      // charge sources: spilled solar (free), exported solar (lose pe), grid (pay pi)
+      const ins=[]; for(let h=0;h<24;h++){ if(spl[h]>0)ins.push({h,c:0,cap:Math.min(spl[h],P),kind:'spill'}); if(exp[h]>0)ins.push({h,c:pe[h],cap:Math.min(exp[h],P),kind:'exp'}); const g=Math.min(P,Math.max(0,importCap-L[h])); if(g>0)ins.push({h,c:pi[h],cap:g,kind:'grid'});}
+      ins.sort((x,y)=>x.c-y.c);
+      let room=battKwh*0.9, oi=0, ii=0;
+      const usedIn=new Map();
+      while(oi<outs.length&&ii<ins.length&&room>1e-6){
+        const o=outs[oi], s=ins[ii];
+        if(o.v*eta*eta-s.c-cyc*2<=0) break;
+        if(o.h===s.h&&o.kind==='exp'){ii++;continue;}
+        const q=Math.min(o.cap/(eta*eta),s.cap,room); // energy drawn from source
+        o.cap-=q*eta*eta; s.cap-=q; room-=q;
+        if(s.kind==='spill')spl[s.h]-=q; else if(s.kind==='exp')exp[s.h]-=q; else imp[s.h]+=q;
+        const out=q*eta*eta; if(o.kind==='def')imp[o.h]-=out; else exp[o.h]+=out;
+        cost+=cyc*2*q*DIM[m]/100;
+        if(o.cap<=1e-6)oi++; if(s.cap<=1e-6)ii++;
+      }
+    }
+    for(let h=0;h<24;h++){ cost+=(imp[h]*pi[h]-exp[h]*pe[h])*DIM[m]/100; impK+=imp[h]*DIM[m]; expK+=exp[h]*DIM[m]; spill+=spl[h]*DIM[m]; selfK+=direct[h]*DIM[m]; genK+=S[h]*DIM[m];}
+  }
+  cost+=tariff.sc*365/100;
+  return {cost,impK,expK,selfK,spill,genK};
+}
+
+/* ---------------- connection ---------------- */
+function connBand(kva,ct){ const B=D.tar.connection.bands; if(!ct&&kva<=23) return B[0]; if(!ct&&kva<=69) return B[1]; return B.slice(2).find(b=>kva<=b.maxKva)||B[B.length-1]; }
+function connAnnual(band,kva){ return band.dailyResidual*365+(band.ct?band.capacityPerKvaDay*kva*365:0); }
+function upgradeCost(kva){ const p=D.tar.connection.upgradeCosts.points; if(kva<=p[0][0]) return 0; for(let i=1;i<p.length;i++){ if(kva<=p[i][0]){const [a,ca]=p[i-1],[b,cb]=p[i]; return ca+(cb-ca)*(kva-a)/(b-a);} } return p[p.length-1][1]; }
+
+
+/* ---------------- main calculation ---------------- */
+function calc(inp){
+  const loc=lookupPostcode(inp.postcode), mp=parseMpan(inp.mpan);
+  const gsp=(mp&&mp.ok&&mp.gsp)||(loc&&loc.gsp)||'L';
+  const region=D.tar.regions[gsp];
+  const load=buildLoad(inp);
+  // solar resource by latitude (Cornwall measured = 1.0)
+  const lat=loc?loc.lat:50.1; const latF=Math.max(0.72,Math.min(1.0,1-(lat-50.1)*0.045));
+  const solS=D.prof.solar.south.map(r=>r.map(x=>x*latF)), solEW=D.prof.solar.eastwest.map(r=>r.map(x=>x*latF));
+  // roof capacity
+  let kwpS=0,kwpEW=0; inp.roofs.forEach(r=>{const k=r.area/5.5; if(r.ori==='S'||r.ori==='SE/SW')kwpS+=k*(r.ori==='S'?1:0.97); else if(r.ori==='EW')kwpEW+=k;});
+  const kwpGround=inp.acres*200; kwpS+=kwpGround;
+  const maxKwp=Math.round(kwpS+kwpEW);
+  const mixS=kwpS+kwpEW>0?kwpS/(kwpS+kwpEW):1;
+  const solarMh=solS.map((r,m)=>r.map((x,h)=>x*mix(mixS)+solEW[m][h]*(1-mix(mixS))));
+  function mix(x){return x}
+  // connection now
+  const phase=inp.phase||'3'; let kvaNow= phase==='ct'?(inp.ctKva||90):phase==='1'?(inp.fuse||100)*0.23:(inp.fuse||100)*0.69;
+  const ctNow=phase==='ct'; const bandNow=connBand(kvaNow,ctNow);
+  // existing tariff baseline
+  const fixed=region.fixed12; const curUnit=inp.unitRate||fixed.unit, curSC=inp.standing||fixed.sc;
+  const flat=v=>Array.from({length:12},()=>Array(24).fill(v));
+  const current={name:'Your current tariff',imp:flat(curUnit),exp:flat(D.tar.export.seg.rate),sc:curSC};
+  const existingKwp=inp.solarNow, existingBatt=inp.battNow;
+  const base=simulate(load,solarMh,existingKwp,existingBatt,current,Math.max(inp.exportNow, existingKwp>0?Math.min(existingKwp,phase==='1'?3.68:11.04):0),kvaNow*0.95);
+  // candidate designs
+  const g98=phase==='1'?3.68:11.04;
+  const tariffs=tariffSets(gsp);
+  /* Octopus business Agile and Panel Power export need total installed capacity of 150kW or less (terms v1.2, 5.1.2.2). Bigger sites only get SEG here. */
+  const EXPORT_CAP_KWP=150; const tariffsFor=kwpTot=>kwpTot>EXPORT_CAP_KWP?tariffs.filter(t=>t.id==='fseg'||t.id==='aseg'):tariffs;
+  const costs=D.tar.costs; const unitSolar=(costs.solarPerKwp[0]+costs.solarPerKwp[1])/2;
+  const tariffOnly=tariffs.map(t=>({t,r:simulate(load,solarMh,existingKwp,existingBatt,t,Math.max(inp.exportNow,existingKwp>0?g98:0),kvaNow*0.95)})).sort((a,b)=>a.r.cost-b.r.cost)[0];
+  const kwpSteps=maxKwp>0?[...new Set([0,10,20,30,50].filter(k=>k<maxKwp).concat([0.1,0.25,0.5,0.75,1].map(f=>Math.round(maxKwp*f))))].sort((a,b)=>a-b):[0];
+  const meanKw=load.annual/8760;
+  const battSteps=[...new Set([0,1,2,4,8].map(k=>Math.round(meanKw*k*24/10)*10).filter(x=>x>=0))].slice(0,5);
+  const grant=inp.grantPct/100;
+  const results=[];
+  const tariffSaving=Math.max(0,base.cost-tariffOnly.r.cost);
+  const exCost=kw=>{const p=D.tar.connection.exportUpgradeCosts.points; if(kw<=p[0][0]+0.01) return 0; for(let i=1;i<p.length;i++){if(kw<=p[i][0]+0.01){const [a,ca]=p[i-1],[b,cb]=p[i]; return ca+(cb-ca)*(kw-a)/(b-a);}} return p[p.length-1][1];};
+  const exportMax=Math.min(150,kvaNow*(ctNow?1:0.95));
+  const exportOpts=[...new Set([Math.max(inp.exportNow,g98),30,50,60,kvaNow>=69?65:0,100,150].filter(x=>x>0&&x<=exportMax+0.5&&x>=Math.max(inp.exportNow,g98)))];
+  for(const kwp of kwpSteps) for(const b of battSteps){
+    const capex=(kwp*unitSolar)+(b>0?b*costs.batteryPerKwh+costs.batteryInverterPer50kW*Math.ceil(b*0.5/50)+costs.batteryAccessories:0);
+    let bestE=null;
+    for(const ex of exportOpts){
+      if(ex>Math.max(inp.exportNow,g98)+0.01 && ex>(kwp+existingKwp)+Math.min(b*0.5,250)+1) continue; // no point exporting more than you can generate
+      const exUp=ex>inp.exportNow+0.01?exCost(ex)-exCost(inp.exportNow):0;
+      let best=null;
+      for(const t of tariffsFor(kwp+existingKwp)){const r=simulate(load,solarMh,kwp+existingKwp,b+existingBatt,t,ex,kvaNow*0.95); if(!best||r.cost<best.r.cost)best={t,r};}
+      const saving=tariffOnly.r.cost-best.r.cost; /* kit saving on top of the best tariff without kit */ const net=(capex+exUp)*(1-grant);
+      const tenYear=(saving-0.01*(capex+exUp))*10*0.95-net;
+      if(!bestE||tenYear>bestE.tenYear) bestE={best,saving,net,tenYear,ex,exUp};
+    }
+    const {best,saving,net,tenYear,ex,exUp}=bestE;
+    const carbon=(load.annual-best.r.impK)*D.tar.carbon.gridKgPerKwh/1000+best.r.expK*D.tar.carbon.gridKgPerKwh/1000;
+    results.push({kwp,b,tariff:best.t,r:best.r,saving,capex:capex+exUp,exUp,net,payback:saving>0?net/saving:Infinity,tenYear,exportCap:ex,needsG99:ex>g98+0.01,carbon});
+  }
+  const within=results.filter(x=>!inp.budget||x.net<=inp.budget);
+  const pool=within.length?within:results;
+  const score={net:x=>x.tenYear,payback:x=>x.saving>0&&x.kwp+x.b>0?-x.payback:-1e9,carbon:x=>x.carbon*1000+x.tenYear*0.001,resilience:x=>(x.b>0?1e7:0)+x.tenYear}[inp.priority]||(x=>x.tenYear);
+  const ranked=pool.filter(x=>x.kwp+x.b>0).sort((a,b)=>score(b)-score(a));
+  const rec=ranked[0]||results[0];
+  // tariff-only option (no kit)
+  // connection need
+  const evScore=inp.road?({lane:1,b:2,a:3,trunk:4}[inp.road]+inp.footfall+(inp.parking>=4?1:0)):0;
+  const newLoadKw=(inp.evFleet>0?11:0)+(evScore>=5?50:evScore>=3?22:evScore>0?7:0);
+  const battGridKw=rec.b>0?Math.min(rec.b*0.5,250):0;
+  const peakNeed=load.peak+newLoadKw;
+  return {overBudget:!!inp.budget&&!within.filter(x=>x.kwp+x.b>0).length,tariffSaving,evScore,newLoadKw,inp,loc,mp,gsp,region,load,solarMh,maxKwp,kwpGround,base,results,rec,ranked,tariffOnly,phase,kvaNow,ctNow,bandNow,g98,peakNeed,battGridKw,latF,unitSolar};
+}
+
+
+function drawChart(c){
+  const W=560,H=200,pad=34; const use=c.load.mh.map(r=>r.reduce((a,b)=>a+b,0)); const sol=c.solarMh.map(r=>r.reduce((a,b)=>a+b,0)*(c.rec.kwp+c.inp.solarNow));
+  const mx=Math.max(...use,...sol,1)*1.1; const bw=(W-pad-10)/12;
+  const y=v=>H-24-(v/mx)*(H-40);
+  let s=`<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Average daily use and solar by month">`;
+  for(let i=0;i<=4;i++){const v=mx*i/4; s+=`<line x1="${pad}" x2="${W-6}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text x="${pad-6}" y="${y(v)+4}" text-anchor="end">${fmt(v)}</text>`;}
+  MON.forEach((m,i)=>{const x=pad+i*bw; s+=`<rect x="${x+3}" y="${y(use[i])}" width="${bw/2-4}" height="${H-24-y(use[i])}" fill="var(--grid)" rx="2"/><rect x="${x+bw/2}" y="${y(sol[i])}" width="${bw/2-4}" height="${H-24-y(sol[i])}" fill="var(--sun)" rx="2"/><text x="${x+bw/2}" y="${H-8}" text-anchor="middle">${m}</text>`;});
+  s+=`<text x="${pad}" y="11">kWh a day</text><rect x="${W-170}" y="2" width="10" height="10" fill="var(--grid)"/><text x="${W-155}" y="11">Farm use</text><rect x="${W-90}" y="2" width="10" height="10" fill="var(--sun)"/><text x="${W-75}" y="11">Solar</text></svg>`;
+  $('chart').innerHTML=s;
+}
+function adv(color,title,body){return `<div class="adv"><span class="dot" style="background:var(${color})"></span><div><b>${title}</b><div class="small" style="color:var(--ink);font-size:13px">${body}</div></div></div>`;}
+function renderConn(c){
+  const out=[]; const B=D.tar.connection.bands;
+  const need=c.peakNeed, bandNow=c.bandNow;
+  if(c.newLoadKw) out.push(adv('--grid','New loads included',`Peak includes about ${fmt(c.newLoadKw)} kW for vehicle charging. A battery or smart charging can cover most of this without raising your import.`));
+  const annNow=connAnnual(bandNow,c.kvaNow);
+  out.push(adv('--grid','Your supply now',`${esc(bandNow.label)}. Peak half-hour demand about ${fmt(c.load.peak/1.35,1)} kW${c.inp.useMode==='hh'&&hhProfile?' (measured)':' (estimated)'}. Network charges about ${gbp(annNow)} a year.`));
+  // stay small advice
+  const wc=B[1];
+  if(need<=69){
+    out.push(adv('--good','Stay on a whole-current supply',`Your demand${c.battGridKw?', with battery charging limited by the controller,':''} fits within 100A per phase (69kVA). Staying here avoids capacity charges: a CT-metered 90kVA supply would add about ${gbp(connAnnual(B[2],90)-connAnnual(wc,69))} a year. If you need more export, ask your network operator for export-only capacity on your existing import.`));
+  } else {
+    const nb=connBand(need,true);
+    out.push(adv('--warn','You may need a bigger supply',`Planned peak of about ${fmt(need)} kW needs ${esc(nb.label)}. Indicative upgrade cost ${gbp(upgradeCost(need))}, plus about ${gbp(connAnnual(nb,need))} a year in network charges. An export limitation scheme (G100) or load control can keep you in a lower band.`));
+  }
+  if(c.rec.needsG99){ out.push(adv('--warn',`Best export size: ${fmt(c.rec.exportCap)} kW`,`The tool tried each export size against its upgrade cost and this paid back best. Above ${c.g98} kW you need a G99 application. Export can usually be raised on your existing import, without moving to a CT-metered supply, so standing charges stay low. Indicative cost ${gbp(c.rec.exUp)}; ask ${esc(c.region.dno)} for a free budget estimate.`)); }
+  else if(c.rec.kwp>0) out.push(adv('--good','Export within G98',`The recommended system works best within the ${c.g98} kW G98 export limit, so you only need to notify your network operator. Surplus is stored or used on the farm.`));
+  // headroom
+  if(c.gsp==='L'){
+    const sub=D.hr.rows.find(r=>r[0].toLowerCase()===(c.inp.sub||'').toLowerCase());
+    if(sub){const col=v=>v>5?'--good':v>1?'--warn':'--bad';
+      out.push(adv(col(sub[6]),`${esc(sub[0])} ${esc(sub[1])} substation`,`Generation headroom ${fmt(sub[6],1)} MW now, ${fmt(sub[7],1)} MW by 2030. Demand headroom ${fmt(sub[4],1)} MW now, ${fmt(sub[5],1)} MW by 2030 (NGED Best View). ${sub[6]<1?'Export may be limited or need reinforcement here.':'There looks to be room for farm-scale export.'}`));}
+    else out.push(adv('--grid','Check local capacity','Pick your nearest primary substation in step 1 to see how much room the local network has for import and export.'));
+  } else out.push(adv('--grid','Local network capacity',`Headroom data for ${esc(c.region.dno)} is not loaded yet. Their network capacity map will show it.`));
+  $('connAdvice').innerHTML=out.join('');
+}
+function renderMore(c){
+  const out=[], inp=c.inp, T=D.tar;
+  // grid trading
+  const bkw=Math.min(c.rec.b*0.5,250);
+  if(c.rec.b>0){const lo=bkw/1000*T.trading.grossPerMwYear[0]*T.trading.share, hi=bkw/1000*T.trading.grossPerMwYear[1]*T.trading.share;
+    out.push(adv('--grid','Grid trading with the battery',`A ${fmt(bkw)} kW battery could earn about ${gbp(lo)}–${gbp(hi)} a year through an aggregator trading wholesale and Balancing Mechanism markets. That is an alternative to trading Agile prices yourself, not on top: on AgriWatt data, Agile self-trading beat aggregator offers below about £20/MW/h.`));}
+  // EV / fleet
+  if(inp.evFleet>0||inp.diesel>0){const litres=inp.diesel||inp.evFleet*1500; const kwh=litres*3.5; const save=litres*0.75-kwh*0.18;
+    out.push(adv('--good','Electrify farm vehicles',`Replacing about ${fmt(litres)} litres of red diesel would use roughly ${fmt(kwh)} kWh a year and save about ${gbp(save)} a year if charged mostly from your own solar and cheap-rate power, and ${fmt(litres*T.carbon.dieselKgPerLitre/1000,1)} t of CO₂.`));}
+  if(inp.road){const sc=c.evScore;
+    const type=sc>=5?'rapid DC (50kW+)':sc>=3?'fast AC (22kW) with room for DC later':'one or two 7–22kW posts for visitors';
+    const kwhDay=sc>=5?120:sc>=3?25:6; const margin=kwhDay*365*(0.55-0.2);
+    out.push(adv(sc>=4?'--good':'--grid',`Public EV charging: ${sc>=5?'strong':sc>=3?'worth exploring':'limited'} spot`,`Suits ${type}. At around ${kwhDay} kWh a day sold for about 55p, the margin over your own power cost could be ${gbp(margin)} a year before running costs. Charging alongside solar and a battery raises the margin and avoids a bigger grid connection.`));}
+  // wind
+  if(inp.windExp){const v=inp.windSpeed||{shelter:4.5,open:5.8,exposed:7.0}[inp.windExp]; const cf=Math.max(0.08,Math.min(0.4,(v-3.5)*0.085)); const kw=50; const kwhY=kw*8760*cf;
+    const prot=inp.prot.includes('np')||inp.prot.includes('nl'); const close=inp.windDist&&inp.windDist<350;
+    const col=prot||close||v<5.5?'--warn':'--good';
+    out.push(adv(col,'Wind turbine',`A 50kW turbine at ${fmt(v,1)} m/s would make about ${fmt(kwhY)} kWh a year (capacity factor ${fmt(cf*100)}%), costing roughly ${gbp(kw*T.costs.windPerKw[0])}–${gbp(kw*T.costs.windPerKw[1])}. ${prot?'In a National Park or National Landscape, full planning with landscape and visual assessments is needed and approval is uncertain. ':''}${close?'Neighbours within 350m make noise and shadow flicker hard to meet. ':''}${v<5.5?'Wind speed looks low: get a site assessment before going further.':'AgriWatt measured 7.5 m/s at 59m at Rosuick Farm, Cornwall.'}`));}
+  // planning
+  if(inp.prot.length){out.push(adv('--warn','Planning in a protected landscape',`Roof-mounted solar on agricultural buildings is usually permitted development, but ${inp.prot.includes('heritage')?'listed buildings and conservation areas need consent, and ':''}ground-mount arrays, wind and new buildings in ${inp.prot.includes('np')?'National Parks':'National Landscapes'} face extra scrutiny. Talk to your planning authority early.`));}
+  // private network
+  if(inp.houses+inp.tenants>0||inp.supplies>1){out.push(adv('--good','Share power across the farm',`With ${inp.houses?fmt(inp.houses)+' house'+(inp.houses>1?'s':''):''}${inp.houses&&inp.tenants?' and ':''}${inp.tenants?fmt(inp.tenants)+' tenant business'+(inp.tenants>1?'es':''):''}${inp.supplies>1?' on '+fmt(inp.supplies)+' supplies':''}, a private network can sell your solar to them at less than they pay now and more than you'd get for export (about 12p). AgriWatt found one shared connection can cost far less than upgrading several. Residential tenants are protected by Ofgem's maximum resale price.`));}
+  // existing kit
+  if(inp.solarNow>0&&c.rec.b>0) out.push(adv('--grid','Make more of existing solar',`Your ${fmt(inp.solarNow)} kWp already installed is included. A battery stores its midday surplus for the evening peak.`));
+  $('moreAdvice').innerHTML=out.join('')||'<div class="small">Add vehicles, road access, wind or tenants to see more opportunities.</div>';
+}
+function renderNext(c){
+  const s=[]; const r=c.rec;
+  if(c.tariffOnly.r.cost<c.base.cost-50) s.push(`Compare your tariff with ${c.tariffOnly.t.name}.`);
+  if(!(c.inp.useMode==='hh'&&hhProfile)) s.push('Download your half-hourly data from your supplier and upload it here for a sharper answer.');
+  if(r.kwp>0) s.push(`Get a structural check of the roofs and two quotes for about ${fmt(r.kwp)} kWp of solar${r.b?' and a '+fmt(r.b)+' kWh battery':''}.`);
+  if(r.needsG99) s.push(`Ask ${c.region.dno} for a free budget estimate for ${fmt(r.exportCap)} kW export on your existing import.`);
+  if(c.inp.prot.length) s.push('Speak to the planning authority about anything ground-mounted.');
+  s.push('Check grants: capital grants, ADOPT trials and Farming Equipment and Technology Fund rounds change often.');
+  $('nextSteps').innerHTML=s.map(x=>`<li>${esc(x)}</li>`).join('');
+}
+
+
+
+/* ================= simple step-by-step version ================= */
+const ENTS={
+  dairy:{label:'Dairy',sub:'Milking cows'},
+  pig:{label:'Pig',sub:'Indoor or outdoor pigs'},
+  broiler:{label:'Poultry',sub:'Broilers or layers'},
+  mixed:{label:'Mixed livestock and arable',sub:'Beef, sheep and crops'},
+  arable:{label:'Arable',sub:'Crops, with a grain store or dryer'},
+  hort:{label:'Horticulture',sub:'Glasshouses, veg or fruit'},
+  other:{label:'Other',sub:'Diversified or something else'}
+};
+/* What a typical farm of each type looks like. Used when someone answers "not sure". */
+const TYPICAL={
+  dairy:  {cows:200, annualKwh:null, phase:'3', roof:'large', roofArea:1500, bill:null},
+  pig:    {annualKwh:490000, phase:'ct', ctKva:200, roof:'vlarge', roofArea:2400},
+  broiler:{annualKwh:290000, phase:'ct', ctKva:150, roof:'vlarge', roofArea:2400},
+  mixed:  {annualKwh:18000, phase:'3', roof:'medium', roofArea:600},
+  arable: {annualKwh:30000, phase:'3', roof:'large', roofArea:1200, loads:['drying']},
+  hort:   {annualKwh:80000, phase:'ct', ctKva:100, roof:'medium', roofArea:600},
+  other:  {annualKwh:20000, phase:'3', roof:'small', roofArea:250}
+};
+const ROOFS={small:{label:'Small',sub:'One or two sheds, under 300 m²',area:250},medium:{label:'Medium',sub:'A few sheds, 300 to 1,000 m²',area:600},large:{label:'Large',sub:'Big sheds, 1,000 to 3,000 m²',area:1800},vlarge:{label:'Very large',sub:'Several big sheds, over 3,000 m²',area:3500},none:{label:'None suitable',sub:'Roofs too weak, shaded or listed',area:0}};
+
+const A={}; const TYP=new Set(); let step=0, kwhMode='kwh';
+const ent=()=>A.ent||'mixed', entName=()=>ENTS[ent()].label.toLowerCase();
+const typLabel=()=>`Not sure: use a typical ${entName()} farm`;
+
+const Q=[
+  {id:'ent', title:'What kind of farm is it?', help:'Pick the main enterprise. This sets sensible starting figures for anything you are not sure about.',
+   type:'choice', options:Object.entries(ENTS).map(([v,o])=>({v,label:o.label,sub:o.sub})), noTypical:true},
+  {id:'cows', show:()=>ent()==='dairy', title:'How many cows do you milk?', help:'Milking, cooling and washing use most of a dairy farm\'s power, so herd size is a good guide.',
+   type:'number', unit:'cows', placeholder:'e.g. 250', typical:()=>({cows:TYPICAL.dairy.cows})},
+  {id:'postcode', title:'What is the farm\'s postcode?', help:'This tells us your local electricity prices, how much sun you get and who runs your local network.',
+   type:'text', placeholder:'e.g. TR12 6DZ', validate:v=>!v||lookupPostcode(v)?null:'We could not find that postcode. Check it, or skip this question.',
+   typicalLabel:'Skip this question', typical:()=>({postcode:''})},
+  {id:'use', title:'How much electricity does the farm use in a year?', help:'It is on your bills, or in your supplier\'s app. A rough figure is fine.',
+   type:'use', typical:()=>({annualKwh:typicalKwh()})},
+  {id:'phase', title:'What kind of electricity supply do you have?', help:'Look at the main fuse box by the meter. Three large fuses means three-phase.',
+   type:'choice', options:[{v:'1',label:'Single-phase',sub:'Like a house. One main fuse'},{v:'3',label:'Three-phase',sub:'Three main fuses, up to 100 amps each'},{v:'ct',label:'Large supply',sub:'Meter with separate current transformers, often with its own transformer'}],
+   typical:()=>({phase:TYPICAL[ent()].phase,ctKva:TYPICAL[ent()].ctKva||0})},
+  {id:'roof', title:'How much strong, unshaded roof do you have?', help:'Count roofs facing south, east or west that could carry solar panels. Ground space comes in the advanced version.',
+   type:'choice', options:Object.entries(ROOFS).map(([v,o])=>({v,label:o.label,sub:o.sub})),
+   typical:()=>({roof:TYPICAL[ent()].roof})},
+  {id:'prot', title:'Is the farm in a National Park or National Landscape (AONB)?', help:'This affects planning for ground-mounted solar and wind. Roof solar is usually still fine.',
+   type:'choice', options:[{v:'no',label:'No'},{v:'nl',label:'National Landscape (AONB)'},{v:'np',label:'National Park'}],
+   typicalLabel:'Not sure: I will check later', typical:()=>({prot:'unknown'}), extra:'<p class="note">You can check on the <a href="https://magic.defra.gov.uk/MagicMap.html" target="_blank" rel="noopener">MAGIC map</a>.</p>'},
+  {id:'budget', title:'How much could you spend?', help:'Here is what a farm like yours might spend. Pick the most you could put in, including any grant or loan.',
+   type:'budget', typicalLabel:'Not sure yet: show me the best option whatever the cost', typical:()=>({budget:0})},
+  {id:'priority', title:'What matters most to you?', help:'We will pick the option that fits best.',
+   type:'choice', options:[{v:'net',label:'Biggest saving over 10 years'},{v:'payback',label:'Quickest payback'},{v:'carbon',label:'Lowest carbon'},{v:'resilience',label:'Keeping going in power cuts',sub:'Includes a battery'}],
+   typicalLabel:'No preference', typical:()=>({priority:'net'})}
+];
+function typicalKwh(){ return ent()==='dairy' ? (A.cows||TYPICAL.dairy.cows)*D.prof.loads.dairy.kwhPerUnit : TYPICAL[ent()].annualKwh; }
+const visible=()=>Q.filter(q=>!q.show||q.show());
+
+function goto(i){ step=i; draw(); window.scrollTo({top:0}); }
+function next(){ const v=visible(); const i=v.indexOf(cur()); if(i<v.length-1) goto(Q.indexOf(v[i+1])); else showResults(); }
+function back(){ const v=visible(); const i=v.indexOf(cur()); if(i>0) goto(Q.indexOf(v[i-1])); }
+const cur=()=>Q[step];
+
+function useTypical(q){ Object.assign(A,q.typical()); if(q.id==='use'){A.annualKwh=0;A.billGbp=0;} TYP.add(q.id); next(); }
+function answer(q,vals){ Object.assign(A,vals); TYP.delete(q.id); next(); }
+
+function draw(){
+  const q=cur(), v=visible(), i=v.indexOf(q);
+  $('progWrap').hidden=false; $('prog').style.width=(100*i/v.length)+'%'; $('count').textContent=`Question ${i+1} of ${v.length}`;
+  let body='';
+  if(q.type==='choice'){
+    const curv=q.id==='roof'?A.roof:q.id==='prot'?A.prot:A[q.id];
+    body=`<div class="choices">${q.options.map(o=>`<button type="button" class="choice${curv===o.v&&!TYP.has(q.id)?' on':''}" data-v="${esc(o.v)}">${esc(o.label)}${o.sub?`<small>${esc(o.sub)}</small>`:''}</button>`).join('')}</div>`;
+  } else if(q.type==='number'||q.type==='text'){
+    const val=TYP.has(q.id)?'':(A[q.id]??'');
+    body=`<div class="unit"><input id="qin" ${q.type==='number'?'type="number" inputmode="numeric" min="0"':'autocomplete="postal-code"'} placeholder="${esc(q.placeholder)}" value="${esc(val)}">${q.unit?`<span>${esc(q.unit)}</span>`:''}</div><div class="err" id="qerr" hidden></div>`;
+  } else if(q.type==='use'){
+    const val=TYP.has('use')?'':(kwhMode==='kwh'?(A.annualKwh||''):(A.billGbp||''));
+    body=`<div class="seg" role="group" aria-label="Units"><button type="button" data-m="kwh" class="${kwhMode==='kwh'?'on':''}">kWh a year</button><button type="button" data-m="gbp" class="${kwhMode==='gbp'?'on':''}">£ a year</button></div>
+    <div class="unit"><input id="qin" type="number" inputmode="numeric" min="0" placeholder="${kwhMode==='kwh'?'e.g. 18000':'e.g. 6000'}" value="${esc(val)}"><span>${kwhMode==='kwh'?'kWh':'£ ex VAT'}</span></div>
+    <div class="err" id="qerr" hidden></div>`;
+  }
+  if(q.type==='budget'){
+    let c0; try{ c0=calc(Object.assign(inputs(),{budget:0,priority:'net'})); }catch(e){}
+    let c1; try{ c1=calc(Object.assign(inputs(),{budget:0,priority:'payback'})); }catch(e){}
+    const kitName=r=>[r.kwp?fmt(r.kwp)+' kWp solar':'',r.b?fmt(r.b)+' kWh battery':''].filter(Boolean).join(' + ');
+    if(c0&&c1){
+      body=`<div class="spend"><div><span class="l">Starter system</span><b>${gbp(c1.rec.net)}</b><span class="s">${esc(kitName(c1.rec))}, pays back in about ${fmt(c1.rec.payback,1)} years</span></div>
+        <div><span class="l">Best long-term set-up</span><b>${gbp(c0.rec.net)}</b><span class="s">${esc(kitName(c0.rec))}, saves about ${gbp(c0.rec.saving)} a year</span></div></div>
+        <p class="note" style="margin:0 0 14px">Switching tariff costs nothing and comes first. Grants can cover part of the cost.</p>`;
+      const B=[[10000,'Up to £10,000'],[25000,'Up to £25,000'],[50000,'Up to £50,000'],[100000,'Up to £100,000'],[250000,'Up to £250,000']];
+      const top=B.findIndex(([v])=>v>=c0.rec.net); const BB=top<0?B:B.slice(0,top+1);
+      body+=`<div class="choices">${BB.map(([v,l])=>{
+        const fit=c0.results.filter(x=>x.kwp+x.b>0&&x.net<=v&&x.saving>0).sort((a,b)=>b.tenYear-a.tenYear)[0];
+        const sub=fit?`Could get ${kitName(fit)}, saving about ${gbp(fit.saving)} a year`:'Not enough for a useful system yet, but a tariff switch still saves money';
+        return `<button type="button" class="choice${A.budget===v&&!TYP.has('budget')?' on':''}" data-b="${v}">${esc(l)}<small>${esc(sub)}</small></button>`;}).join('')}</div>`;
+    }
+  }
+  const showNext=q.type!=='choice'&&q.type!=='budget';
+  $('screen').innerHTML=`<div class="card"><h1 id="qt" tabindex="-1">${esc(q.title)}</h1><p class="help">${esc(q.help)}</p>${body}${q.extra||''}
+   ${q.noTypical?'':`<button type="button" class="dunno" id="dunno">${q.typicalLabel?esc(q.typicalLabel):`Not sure: use a <b>typical ${esc(entName())} farm</b>`}</button>`}
+   <div class="nav">${i>0?'<button type="button" class="btn ghost" id="bk">← Back</button>':''}${showNext?'<button type="button" class="btn primary" id="nx">Next →</button>':''}</div></div>`;
+  $('screen').querySelectorAll('.choice').forEach(b=>b.onclick=()=>{const v=b.dataset.v; answer(q, q.id==='phase'&&v==='ct'?{phase:v,ctKva:TYPICAL[ent()].ctKva||100}:{[q.id]:v});});
+  $('screen').querySelectorAll('[data-b]').forEach(b=>b.onclick=()=>answer(q,{budget:+b.dataset.b}));
+  $('screen').querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{kwhMode=b.dataset.m; draw();});
+  if($('dunno')) $('dunno').onclick=()=>useTypical(q);
+  if($('bk')) $('bk').onclick=back;
+  const inp=$('qin');
+  const submit=()=>{
+    const raw=inp.value.trim(); const err=$('qerr');
+    if(!raw){ err.hidden=false; err.textContent='Type an answer, or choose "not sure".'; return; }
+    if(q.validate){const m=q.validate(raw); if(m){err.hidden=false; err.textContent=m; return;}}
+    if(q.type==='use'){ const n=parseFloat(raw); if(!(n>0)){err.hidden=false;err.textContent='Please enter a number.';return;}
+      if(kwhMode==='kwh') answer(q,{annualKwh:n,billGbp:0}); else answer(q,{billGbp:n,annualKwh:0}); }
+    else answer(q,{[q.id]:q.type==='number'?parseFloat(raw):raw.toUpperCase()});
+  };
+  if($('nx')) $('nx').onclick=submit;
+  if(inp){ inp.addEventListener('keydown',e=>{if(e.key==='Enter')submit();}); inp.focus(); } else $('qt').focus();
+}
+
+/* Turn the simple answers into the full input set the engine expects. */
+function inputs(){
+  const e=ent(), T=TYPICAL[e];
+  const loc=lookupPostcode(A.postcode); const gsp=loc?loc.gsp:'L'; const reg=D.tar.regions[gsp];
+  let annual=A.annualKwh||0;
+  if(!annual && A.billGbp>0){ annual=Math.max(0,(A.billGbp-reg.fixed12.sc*3.65)/(reg.fixed12.unit/100)); }
+  if(!annual) annual=typicalKwh();
+  const area=ROOFS[A.roof||T.roof].area;
+  const prot=A.prot==='nl'||A.prot==='np'?[A.prot]:[];
+  return {postcode:A.postcode||'', prot, sub:'', phase:A.phase||T.phase, fuse:100, ctKva:A.ctKva||T.ctKva||0,
+    exportNow:0, solarNow:0, battNow:0, mpan:'', useMode:(A.annualKwh>0||A.billGbp>0)?'annual':'estimate', annualKwh:annual, monthly:Array(12).fill(0), unitRate:0, standing:0,
+    ent:e, cows:A.cows||0, loads:T.loads||[], houses:0, tenants:0, supplies:1,
+    roofs:area?[{area:area*0.6,ori:'S'},{area:area*0.4,ori:'EW'}]:[], acres:0, windExp:'', windSpeed:0, windDist:0,
+    evFleet:0, diesel:0, road:'', footfall:0, parking:0, budget:A.budget||0, grantPct:0, priority:A.priority||'net'};
+}
+
+let sampleFn=null; (async()=>{ try{ if(window.claude&&window.claude.use) sampleFn=await window.claude.use('sample'); }catch(e){} })();
+
+function showResults(){
+  const inp=inputs(); let c; try{ c=calc(inp); }catch(e){ console.error(e); $('screen').innerHTML='<div class="card">Something went wrong working this out. Please try again.</div>'; return; }
+  last=c; const r=c.rec;
+  if(A.billGbp>0&&!A.annualKwh) c.load.source='estimated from your yearly bill of '+gbp(A.billGbp);
+  c.split=null; const self=r.r.genK?100*(r.r.genK-r.r.expK-r.r.spill)/r.r.genK:0, sold=r.r.genK?100*r.r.expK/r.r.genK:0, cut=r.r.genK?100*r.r.spill/r.r.genK:0;
+  $('progWrap').hidden=true;
+  renderConn(c); renderMore(c);
+  const kit=[r.kwp?fmt(r.kwp)+' kWp of solar':'',r.b?'a '+fmt(r.b)+' kWh battery':''].filter(Boolean).join(' and ')||'No new kit for now';
+  const pts=[];
+  if(c.tariffOnly.r.cost<c.base.cost-50) pts.push(['--good',`<b>Start with your tariff.</b> Switching to ${esc(c.tariffOnly.t.name)} could save about ${gbp(c.base.cost-c.tariffOnly.r.cost)} a year before you buy anything.`]);
+  if(r.kwp) pts.push(['--sun',`<b>Solar:</b> ${fmt(r.kwp)} kWp would make about ${fmt(r.r.genK)} kWh a year. About ${fmt(self)}% would be used on the farm and ${fmt(sold)}% sold to the grid${cut>=1?`. About ${fmt(cut)}% would be wasted on the sunniest days because export is capped at ${fmt(r.exportCap)} kW`:''}.`]);
+  if(r.b) pts.push(['--grid',`<b>Battery:</b> stores cheap night-time and spare solar power and uses or sells it when prices are highest, between 4 and 7pm.`]);
+  pts.push(r.needsG99
+    ? ['--warn',`<b>Grid connection:</b> keep your current supply and ask ${esc(c.region.dno)} to raise export to ${fmt(r.exportCap)} kW (about ${gbp(r.exUp)}, included above). Their budget estimates are free.`]
+    : ['--good',`<b>Grid connection:</b> no upgrade needed. Your current supply is enough.`]);
+  if(r.kwp>150) pts.push(['--grid',`<b>Export tariff:</b> above 150kW of solar, Octopus's better business export tariffs aren't available, so this assumes the basic 3p SEG rate. A smaller system may pay back faster.`]);
+  if(c.inp.prot.length) pts.push(['--warn',`<b>Planning:</b> roof solar is usually fine in a protected landscape, but talk to the planning office before anything on the ground.`]);
+  const T=D.tar.costs, solarC=r.kwp*c.unitSolar, battC=r.b>0?r.b*T.batteryPerKwh+T.batteryInverterPer50kW*Math.ceil(r.b*0.5/50)+T.batteryAccessories:0;
+  const parts=[r.kwp?`Solar ${gbp(solarC)}`:'',r.b?`Battery and inverter ${gbp(battC)}`:'',r.exUp?`Export upgrade ${gbp(r.exUp)}`:''].filter(Boolean).join(' · ');
+  let budgetHtml='';
+  if(A.budget){
+    budgetHtml=c.overBudget
+      ? `<div class="typ"><b>Nothing useful fits under ${gbp(A.budget)} yet.</b> The smallest worthwhile option is shown above. Start with the tariff switch, which is free, and look for grants or phase the work.</div>`
+      : `<p class="small" style="margin:8px 0 0"><span class="tag">Within your budget of ${gbp(A.budget)}</span></p>`;
+    let c0=null; try{ c0=calc(Object.assign(inputs(),{budget:0})); }catch(e){}
+    if(c0&&!c.overBudget&&c0.rec.tenYear>r.tenYear+2000&&c0.rec.net>r.net)
+      pts.push(['--grid',`<b>If you could spend more:</b> about ${gbp(c0.rec.net)} on ${[c0.rec.kwp?fmt(c0.rec.kwp)+' kWp solar':'',c0.rec.b?'a '+fmt(c0.rec.b)+' kWh battery':''].filter(Boolean).join(' and ')} would save ${gbp(c0.rec.saving)} a year, ${gbp(c0.rec.tenYear-r.tenYear)} more over 10 years. You could start with this and add more later.`]);
+  }
+  const typs=visible().filter(q=>TYP.has(q.id)&&!['postcode','priority','prot','budget'].includes(q.id));
+  const typNames={cows:'herd size',use:'electricity use',phase:'supply type',roof:'roof space'};
+  $('screen').innerHTML=`<div class="res">
+   <div class="card"><span class="tag">Our suggestion</span><h1 style="margin-top:8px">${esc(kit[0].toUpperCase()+kit.slice(1))}</h1>
+    <div class="kpis">
+     <div class="kpi"><div class="v">${gbp(r.saving)}</div><div class="l">saved a year by the new kit</div></div>
+     <div class="kpi"><div class="v">${isFinite(r.payback)?fmt(r.payback,1)+' years':'–'}</div><div class="l">to pay for itself</div></div>
+     <div class="kpi"><div class="v">${gbp(r.net)}</div><div class="l">rough cost to install</div></div>
+     <div class="kpi"><div class="v">${gbp(r.tenYear)}</div><div class="l">better off after 10 years</div></div>
+    </div>
+    ${parts?`<p class="small" style="margin:10px 0 0">Cost breakdown: ${parts}. Ex VAT, from AgriWatt quotes.</p>`:''}${budgetHtml}
+    <p class="small" style="margin:12px 0 0">Your electricity costs about ${gbp(c.base.cost)} a year now (${fmt(c.load.annual)} kWh, ${esc(c.load.source)}).${c.tariffSaving>50?` A better tariff alone takes that to ${gbp(c.tariffOnly.r.cost)}.`:''} With the new kit: ${gbp(r.r.cost)}${r.r.cost<0?' (you would earn more than you spend)':''}. Best tariff with this set-up: ${esc(r.tariff.name)}.</p></div>
+   <div class="card"><h2 style="margin-bottom:12px">What this means</h2><ul class="pts">${pts.map(p=>`<li><span class="dot" style="background:var(${p[0]})"></span><div>${p[1]}</div></li>`).join('')}</ul></div>
+   ${typs.length?`<div class="typ">We used typical ${esc(entName())} farm figures for your <b>${typs.map(q=>typNames[q.id]).join(', ')}</b>. Real figures will make this more accurate. ${typs.map(q=>`<button type="button" data-q="${q.id}">Change ${esc(typNames[q.id])}</button>`).join(' · ')}</div>`:''}
+   <div class="card"><details class="more"><summary>More detail: connection and other opportunities</summary><div class="advice">${$('connAdvice').innerHTML}${$('moreAdvice').innerHTML}</div></details></div>
+   ${sampleFn?`<div class="card"><h2>Explain it to me</h2><p class="small">Ask Claude to talk through these results in plain English.</p><button type="button" class="btn primary" id="aiBtn" style="margin-left:0">Explain my results</button><div class="ai" id="aiOut"></div></div>`:''}
+   <div class="card"><h2>Want to go further?</h2><p class="help" style="margin-top:6px">The advanced version adds half-hourly data upload, exact roof sizes, vehicles and charging, wind, tenants and houses, budget and grants, and local network capacity. Your answers carry over.</p>
+    <div class="nav" style="margin-top:0"><button type="button" class="btn" id="again">Start again</button><a class="btn primary" href="advanced.html" id="toAdv" style="text-decoration:none">Open the advanced version →</a></div></div>
+  </div>`;
+  $('screen').querySelectorAll('.typ button').forEach(b=>b.onclick=()=>goto(Q.findIndex(q=>q.id===b.dataset.q)));
+  $('again').onclick=()=>{ Object.keys(A).forEach(k=>delete A[k]); TYP.clear(); goto(0); };
+  $('toAdv').onclick=handoff; $('advLink').onclick=handoff;
+  if($('aiBtn')) $('aiBtn').onclick=explain;
+  window.scrollTo({top:0});
+}
+/* Pass answers to the advanced page (same site, this browser tab only). */
+function handoff(){
+  if(!A.ent) return;
+  const inp=inputs();
+  const o={postcode:inp.postcode,phase:inp.phase,fuse:'100',ctKva:inp.ctKva||'',cows:inp.cows||'',useMode:TYP.has('use')?'estimate':'annual',annualKwh:TYP.has('use')?'':Math.round(inp.annualKwh),
+    ent:inp.ent,priority:inp.priority,budget:A.budget||'',prot:inp.prot,roofs:inp.roofs.map(x=>[Math.round(x.area),x.ori])};
+  try{ sessionStorage.setItem('fef-handoff',JSON.stringify(o)); }catch(e){}
+}
+async function explain(){
+  const c=last, r=c.rec; const self=r.r.genK?100*(r.r.genK-r.r.expK-r.r.spill)/r.r.genK:0, sold=r.r.genK?100*r.r.expK/r.r.genK:0, cut=r.r.genK?100*r.r.spill/r.r.genK:0; const out=$('aiOut'); out.textContent='Thinking...';
+  const facts={farmType:ENTS[c.inp.ent].label,region:c.region.name,annualKwh:Math.round(c.load.annual),usageSource:c.load.source,billNow:Math.round(c.base.cost),
+    guessedFigures:[...TYP],budgetLimit:A.budget||'none',nothingFitsBudget:c.overBudget,tariffSwitchSavingPerYear:Math.round(c.tariffSaving),billWithBestTariffNoKit:Math.round(c.tariffOnly.r.cost),recommended:{solarKwp:r.kwp,batteryKwh:r.b,tariff:r.tariff.name,kitSavingPerYearOnTopOfTariffSwitch:Math.round(r.saving),billWithKit:Math.round(r.r.cost),solarKwhYear:Math.round(r.r.genK),usedOnFarmPct:Math.round(self),exportedPct:Math.round(sold),curtailedPct:Math.round(cut),cost:Math.round(r.net),paybackYears:+r.payback.toFixed(1),tenYearNet:Math.round(r.tenYear),exportKw:Math.round(r.exportCap),needsExportUpgrade:r.needsG99},
+    protectedLandscape:c.inp.prot,connectionAdvice:$('connAdvice').innerText};
+  try{ await sampleFn([{role:'user',content:'You are a practical farm energy adviser for UK farmers, writing in British English. Using ONLY these figures from a farm energy tool, explain in under 200 words what the farmer should do first, why, and what to check before spending money. If some figures were guessed from a typical farm, say which and suggest getting the real ones. Plain words, no headings, short paragraphs. Figures: '+JSON.stringify(facts)}],{onText:({text})=>{out.textContent=text;}}); }
+  catch(e){ out.textContent=e&&e.code==='not_granted'?'Explanations are switched off for this page.':'Could not get an explanation just now.'; }
+}
+
+/* start */
+let last=null;
+$('advLink').onclick=handoff;
+$('screen').innerHTML='<div class="card"><h1>Find your farm\'s energy savings</h1><p class="help">Loading...</p></div>';
+loadData().then(()=>{
+  $('progWrap').hidden=true;
+  $('screen').innerHTML=`<div class="card"><h1>Find your farm's energy savings</h1>
+   <p class="help" style="font-size:17px">Answer ${visible().length} quick questions. If you don't know an answer, we'll use figures from a typical farm like yours. It takes about two minutes.</p>
+   <p class="help">You'll get a suggested solar and battery set-up, what it would cost, how much it would save and how quickly it would pay for itself.</p>
+   <div class="nav"><button type="button" class="btn primary" id="go" style="margin-left:0">Start →</button></div></div>`;
+  $('go').onclick=()=>goto(0); $('go').focus();
+}).catch(e=>{ console.error(e); $('screen').innerHTML='<div class="card">Could not load the data files. Check the data folder is published next to this page.</div>'; });
+
+})();
+</script>
+
+</body>
+</html>

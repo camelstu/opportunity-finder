@@ -1,0 +1,461 @@
+{
+ "version": "2026-11-23",
+ "source": "Octopus Energy business tariffs (public API), prices ex VAT. Update with tools/update_data.py.",
+ "regions": {
+  "A": {
+   "name": "Eastern England",
+   "dno": "UK Power Networks",
+   "mpanId": "10",
+   "fixed12": {
+    "unit": 31.75,
+    "sc": 61.59
+   },
+   "fixed24": {
+    "unit": 28.86,
+    "sc": 65.16
+   },
+   "noStanding": 40.13,
+   "agileSC": 50.56,
+   "agileFactor": [
+    1.0,
+    0.885,
+    1.044,
+    1.021
+   ]
+  },
+  "B": {
+   "name": "East Midlands",
+   "dno": "National Grid Electricity Distribution",
+   "mpanId": "11",
+   "fixed12": {
+    "unit": 31.19,
+    "sc": 64.61
+   },
+   "fixed24": {
+    "unit": 28.32,
+    "sc": 68.89
+   },
+   "noStanding": 40.16,
+   "agileSC": 56.12,
+   "agileFactor": [
+    0.993,
+    0.856,
+    1.005,
+    0.961
+   ]
+  },
+  "C": {
+   "name": "London",
+   "dno": "UK Power Networks",
+   "mpanId": "12",
+   "fixed12": {
+    "unit": 32.77,
+    "sc": 50.12
+   },
+   "fixed24": {
+    "unit": 29.77,
+    "sc": 54.18
+   },
+   "noStanding": 39.56,
+   "agileSC": 47.37,
+   "agileFactor": [
+    1.003,
+    0.848,
+    1.063,
+    0.977
+   ]
+  },
+  "D": {
+   "name": "Merseyside and North Wales",
+   "dno": "SP Energy Networks",
+   "mpanId": "13",
+   "fixed12": {
+    "unit": 34.39,
+    "sc": 79.78
+   },
+   "fixed24": {
+    "unit": 31.44,
+    "sc": 83.73
+   },
+   "noStanding": 45.81,
+   "agileSC": 74.41,
+   "agileFactor": [
+    1.087,
+    0.943,
+    1.079,
+    0.989
+   ]
+  },
+  "E": {
+   "name": "West Midlands",
+   "dno": "National Grid Electricity Distribution",
+   "mpanId": "14",
+   "fixed12": {
+    "unit": 31.5,
+    "sc": 69.12
+   },
+   "fixed24": {
+    "unit": 28.62,
+    "sc": 73.34
+   },
+   "noStanding": 41.13,
+   "agileSC": 59.73,
+   "agileFactor": [
+    1.008,
+    0.858,
+    1.004,
+    0.972
+   ]
+  },
+  "F": {
+   "name": "North East England",
+   "dno": "Northern Powergrid",
+   "mpanId": "15",
+   "fixed12": {
+    "unit": 31.72,
+    "sc": 69.89
+   },
+   "fixed24": {
+    "unit": 28.86,
+    "sc": 74.74
+   },
+   "noStanding": 41.14,
+   "agileSC": 59.81,
+   "agileFactor": [
+    1.0,
+    0.865,
+    1.024,
+    0.903
+   ]
+  },
+  "G": {
+   "name": "North West England",
+   "dno": "Electricity North West",
+   "mpanId": "16",
+   "fixed12": {
+    "unit": 32.51,
+    "sc": 57.37
+   },
+   "fixed24": {
+    "unit": 29.78,
+    "sc": 63.08
+   },
+   "noStanding": 40.35,
+   "agileSC": 54.36,
+   "agileFactor": [
+    0.986,
+    0.923,
+    1.055,
+    0.971
+   ]
+  },
+  "H": {
+   "name": "Southern England",
+   "dno": "Scottish and Southern Electricity Networks",
+   "mpanId": "20",
+   "fixed12": {
+    "unit": 31.71,
+    "sc": 64.11
+   },
+   "fixed24": {
+    "unit": 28.91,
+    "sc": 68.31
+   },
+   "noStanding": 39.52,
+   "agileSC": 52.72,
+   "agileFactor": [
+    0.998,
+    0.875,
+    1.019,
+    1.007
+   ]
+  },
+  "J": {
+   "name": "South East England",
+   "dno": "UK Power Networks",
+   "mpanId": "19",
+   "fixed12": {
+    "unit": 31.64,
+    "sc": 62.73
+   },
+   "fixed24": {
+    "unit": 28.77,
+    "sc": 66.17
+   },
+   "noStanding": 40.39,
+   "agileSC": 50.37,
+   "agileFactor": [
+    0.997,
+    0.963,
+    1.034,
+    1.033
+   ]
+  },
+  "K": {
+   "name": "South Wales",
+   "dno": "National Grid Electricity Distribution",
+   "mpanId": "21",
+   "fixed12": {
+    "unit": 32.29,
+    "sc": 71.17
+   },
+   "fixed24": {
+    "unit": 29.45,
+    "sc": 75.77
+   },
+   "noStanding": 41.88,
+   "agileSC": 59.74,
+   "agileFactor": [
+    1.009,
+    0.934,
+    1.023,
+    0.93
+   ]
+  },
+  "L": {
+   "name": "South West England",
+   "dno": "National Grid Electricity Distribution",
+   "mpanId": "22",
+   "fixed12": {
+    "unit": 32.1,
+    "sc": 71.16
+   },
+   "fixed24": {
+    "unit": 29.31,
+    "sc": 75.89
+   },
+   "noStanding": 41.56,
+   "agileSC": 61.63,
+   "agileFactor": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ]
+  },
+  "M": {
+   "name": "Yorkshire",
+   "dno": "Northern Powergrid",
+   "mpanId": "23",
+   "fixed12": {
+    "unit": 32.14,
+    "sc": 69.58
+   },
+   "fixed24": {
+    "unit": 29.22,
+    "sc": 74.78
+   },
+   "noStanding": 41.72,
+   "agileSC": 59.08,
+   "agileFactor": [
+    1.013,
+    0.805,
+    1.02,
+    0.947
+   ]
+  },
+  "N": {
+   "name": "South and Central Scotland",
+   "dno": "SP Energy Networks",
+   "mpanId": "18",
+   "fixed12": {
+    "unit": 32.3,
+    "sc": 75.55
+   },
+   "fixed24": {
+    "unit": 29.39,
+    "sc": 79.94
+   },
+   "noStanding": 43.09,
+   "agileSC": 62.41,
+   "agileFactor": [
+    1.019,
+    0.898,
+    1.046,
+    0.866
+   ]
+  },
+  "P": {
+   "name": "North Scotland",
+   "dno": "Scottish and Southern Electricity Networks",
+   "mpanId": "17",
+   "fixed12": {
+    "unit": 33.01,
+    "sc": 73.68
+   },
+   "fixed24": {
+    "unit": 30.68,
+    "sc": 77.59
+   },
+   "noStanding": 41.03,
+   "agileSC": 67.05,
+   "agileFactor": [
+    1.003,
+    0.852,
+    1.079,
+    0.824
+   ]
+  }
+ },
+ "agileFactorNote": "Multipliers on the region L Agile shape: [import off-peak, import 4-7pm, export off-peak, export 4-7pm], from each region's actual prices 23 Nov 2025 - 22 Nov 2026.",
+ "export": {
+  "seg": {
+   "name": "Octopus Business SEG 12M Fixed",
+   "rate": 3.0
+  },
+  "panelPower": {
+   "name": "Octopus Panel Power (flat)",
+   "rate": 12.0,
+   "note": "Flat-rate export; check current eligibility and rate with Octopus."
+  },
+  "agile": {
+   "name": "Shape Shifters: Export (Agile, half-hourly)"
+  }
+ },
+ "connection": {
+  "note": "Daily network charges by connection size. Whole-current supplies (up to 100A per phase, about 69kVA three-phase) have no agreed capacity and pay a small consumption-banded residual; CT-metered supplies pay by agreed capacity band. Figures 2026/27, ex VAT, indicative.",
+  "bands": [
+   {
+    "id": "wc1",
+    "label": "Single-phase, up to 100A (about 23kVA)",
+    "maxKva": 23,
+    "dailyResidual": 0.7,
+    "capacityPerKvaDay": 0,
+    "ct": false
+   },
+   {
+    "id": "wc3",
+    "label": "Three-phase whole-current, up to 100A per phase (about 69kVA)",
+    "maxKva": 69,
+    "dailyResidual": 0.7,
+    "capacityPerKvaDay": 0,
+    "ct": false
+   },
+   {
+    "id": "lv1",
+    "label": "CT-metered, agreed capacity up to 90kVA (LV1)",
+    "maxKva": 90,
+    "dailyResidual": 5.8,
+    "capacityPerKvaDay": 0.035,
+    "ct": true
+   },
+   {
+    "id": "lv2",
+    "label": "CT-metered, 90\u2013150kVA (LV2)",
+    "maxKva": 150,
+    "dailyResidual": 11.51,
+    "capacityPerKvaDay": 0.035,
+    "ct": true
+   },
+   {
+    "id": "lv3",
+    "label": "CT-metered, 150\u2013250kVA (LV3)",
+    "maxKva": 250,
+    "dailyResidual": 14.38,
+    "capacityPerKvaDay": 0.035,
+    "ct": true
+   },
+   {
+    "id": "lv4",
+    "label": "CT-metered, over 250kVA (LV4)",
+    "maxKva": 1000,
+    "dailyResidual": 38.18,
+    "capacityPerKvaDay": 0.035,
+    "ct": true
+   }
+  ],
+  "upgradeCosts": {
+   "note": "AgriWatt NGED budget estimates (South West, Nov 2026) and a 2026 quote; site-specific, indicative only.",
+   "points": [
+    [
+     69,
+     0
+    ],
+    [
+     90,
+     11927
+    ],
+    [
+     150,
+     15430
+    ],
+    [
+     1000,
+     143292
+    ]
+   ]
+  },
+  "g98": {
+   "singlePhaseKw": 3.68,
+   "threePhaseKw": 11.04
+  },
+  "exportUpgradeCosts": {
+   "note": "Cost to raise export on an existing whole-current supply (G99 application, protection, possible service or transformer work). AgriWatt NGED quotes 2026: 50kW about \u00a312k, 60kW about \u00a315k. Indicative.",
+   "points": [
+    [
+     11.04,
+     0
+    ],
+    [
+     30,
+     3000
+    ],
+    [
+     50,
+     12000
+    ],
+    [
+     60,
+     15000
+    ],
+    [
+     69,
+     20000
+    ],
+    [
+     150,
+     45000
+    ]
+   ]
+  }
+ },
+ "costs": {
+  "note": "AgriWatt quotes 2026, ex VAT. Indicative.",
+  "solarPerKwp": [
+   350,
+   450
+  ],
+  "batteryPerKwh": 116,
+  "batteryInverterPer50kW": 2266,
+  "batteryAccessories": 1000,
+  "acCharger22kW": [
+   1500,
+   3000
+  ],
+  "dcCharger50kW": [
+   20000,
+   35000
+  ],
+  "dcChargerBattery280kW": 70000,
+  "windPerKw": [
+   3000,
+   5000
+  ],
+  "privateWirePerMetre": [
+   60,
+   120
+  ]
+ },
+ "trading": {
+  "note": "Aggregator wholesale and Balancing Mechanism trading (Flexitricity meeting notes, Nov 2026): roughly \u00a340-50k per MW of battery a year gross, 70% to the site owner, 100kW minimum (smaller sites pooled). Only worth it where it beats your own tariff trading.",
+  "grossPerMwYear": [
+   40000,
+   50000
+  ],
+  "share": 0.7
+ },
+ "carbon": {
+  "gridKgPerKwh": 0.2,
+  "dieselKgPerLitre": 2.68
+ }
+}
